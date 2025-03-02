@@ -1,0 +1,44 @@
+## Versões antigas
+older-version/
+older/
+
+### Dependências e arquivos de configuração não necessários
+node_modules/
+example/
+bun.lockb
+.gitignore
+.npmignore
+.npmrc
+vite.config.ts
+
+### Código fonte e diretórios relacionados ao desenvolvimento
+src/
+assets/
+test/
+tests/
+__tests__/
+scripts/
+
+
+### Relatórios e arquivos temporários
+coverage/
+*.log
+*.tmp
+*.bak
+*.swp
+
+### Configurações de ferramentas e editores
+.idea/
+.vscode/
+.DS_Store
+
+
+### Arquivos de ambiente
+.env
+.env.*
+
+
+### Diretórios de build e distribuição
+build/
+dist/
+
