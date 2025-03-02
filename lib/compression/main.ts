@@ -1,16 +1,15 @@
-// src/middleware/compression/compression-middleware.ts
 import { CompressorFactory } from "./compressor-factory";
 import { StreamCompressorFactory } from "./stream-factory";
 import { Elysia } from "elysia";
 import memCache from "./cache";
 import type { CompressionOptions, ElysiaContext, Compressor } from "./types";
 import { constants } from "node:zlib";
-import { pipeline } from "stream/promises"; 
+import { pipeline } from "stream/promises";
 
 class CompressionHandler {
   constructor(
     private options: CompressionOptions,
-    private compressor: Compressor,
+    private compressor: Compressor
   ) {}
 
   private shouldCompress(context: ElysiaContext): boolean {
@@ -74,7 +73,7 @@ class CompressionHandler {
       const streamFactory = new StreamCompressorFactory();
       const compressionStream = streamFactory.createCompressor(
         algorithm,
-        level,
+        level
       );
 
       try {
@@ -92,12 +91,11 @@ class CompressionHandler {
                 chunks.push(chunk);
                 yield chunk;
               }
-            },
+            }
           );
 
-          // Convert Buffer[] to Uint8Array[] before Buffer.concat
-          const uint8Chunks: Uint8Array[] = chunks.map(chunk => Uint8Array.from(chunk));
-          const compressed = Buffer.from(Buffer.concat(uint8Chunks));
+          // Concatenando Buffer[] para um uníco Buffer
+          const compressed = Buffer.concat(chunks);
 
           set.headers["Content-Encoding"] =
             compressionStream.compressor.constructor.name
@@ -110,11 +108,11 @@ class CompressionHandler {
 
           return compressed;
         } else {
-          return Buffer.from(JSON.stringify(response)); // Return Buffer on non string/object response
+          return Buffer.from(JSON.stringify(response));
         }
       } catch (error) {
         console.error("Erro de compressão de stream:", error);
-        return Buffer.from(JSON.stringify({ error: "Compression error" })); // Return Buffer on Error
+        return Buffer.from(JSON.stringify({ error: "Compression error" }));
       }
     } else {
       let text = "";
@@ -147,13 +145,13 @@ class CompressionHandler {
 
         console.log(`Tamanho original: ${Buffer.from(text).length} bytes`);
         console.log(
-          `Tamanho comprimido (${this.compressor.getEncoding()}, level ${level}): ${compressedSize} bytes`,
+          `Tamanho comprimido (${this.compressor.getEncoding()}, level ${level}): ${compressedSize} bytes`
         );
 
         memCache.set(
           cacheKey,
           compressed,
-          this.options.cacheTTL ?? 24 * 60 * 60,
+          this.options.cacheTTL ?? 24 * 60 * 60
         );
         console.log(`Cache set for ${cacheKey}`);
         return compressed;
