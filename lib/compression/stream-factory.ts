@@ -42,7 +42,10 @@ class DeflateCompressor implements ICompressor {
 export class CompressionStream extends Transform {
   public compressor: ICompressor;
 
-  constructor(compressor: ICompressor, private level = 6) {
+  constructor(
+    compressor: ICompressor,
+    private level = 6
+  ) {
     super();
     this.compressor = compressor;
   }
@@ -50,7 +53,7 @@ export class CompressionStream extends Transform {
   _transform(
     chunk: Buffer,
     _encoding: BufferEncoding,
-    callback: (error?: Error | null, chunk?: Buffer) => void,
+    callback: (error?: Error | null, chunk?: Buffer) => void
   ): void {
     try {
       const compressed = this.compressor.compress(chunk, this.level);

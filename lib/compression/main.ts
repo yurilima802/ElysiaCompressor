@@ -1,3 +1,4 @@
+// src/middleware/compression/compression-middleware.ts
 import { CompressorFactory } from "./compressor-factory";
 import { StreamCompressorFactory } from "./stream-factory";
 import { Elysia } from "elysia";
@@ -94,13 +95,15 @@ class CompressionHandler {
             }
           );
 
-          // Concatenando Buffer[] para um uníco Buffer
-          const compressed = Buffer.concat(chunks);
+          // Convert Buffer[] to Uint8Array[] before Buffer.concat
+          const uint8Chunks: Uint8Array[] = chunks.map((chunk) =>
+            Uint8Array.from(chunk)
+          );
+          const compressed = Buffer.concat(uint8Chunks);
 
-          set.headers["Content-Encoding"] =
-            compressionStream.compressor.constructor.name
-              .replace("Compressor", "")
-              .toLowerCase();
+          set.headers["Content-Encoding"] = compressionStream.constructor.name
+            .replace("Compressor", "")
+            .toLowerCase();
           set.headers["Content-Type"] =
             typeof response === "object"
               ? "application/json; charset=utf-8"
@@ -108,11 +111,11 @@ class CompressionHandler {
 
           return compressed;
         } else {
-          return Buffer.from(JSON.stringify(response));
+          return Buffer.from(JSON.stringify(response)); // Return Buffer on non string/object response
         }
       } catch (error) {
-        console.error("Erro de compressão de stream:", error);
-        return Buffer.from(JSON.stringify({ error: "Compression error" }));
+        console.error("Error de compressão de stream:", error); // Fixed typo
+        return Buffer.from(JSON.stringify({ error: "Compression error" })); // Return Buffer on Error
       }
     } else {
       let text = "";
